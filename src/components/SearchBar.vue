@@ -14,12 +14,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
 const keyword = ref(route.query.keyword || '')
+
+watch(() => route.query.keyword, (newVal) => {
+  keyword.value = newVal || ''
+})
 
 const handleSearch = () => {
   if (keyword.value.trim()) {
@@ -32,6 +36,9 @@ const handleSearch = () => {
 
 const handleClear = () => {
   keyword.value = ''
+  router.push({
+    path: '/search'
+  })
 }
 </script>
 

@@ -98,7 +98,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useNoteStore, useUserStore } from '@/stores/noteStore'
+import { useNoteStore } from '@/stores/noteStore'
+import { useUserStore } from '@/stores/userStore'
 import { Plus, Close } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
