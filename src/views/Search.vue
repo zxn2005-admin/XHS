@@ -1,10 +1,6 @@
 <template>
   <div class="search-page">
     <div class="container">
-      <div class="search-header">
-        <SearchBar />
-      </div>
-      
       <div class="hot-tags" v-if="!searchKeyword">
         <h3 class="section-title">热门搜索</h3>
         <div class="tags-list">
@@ -20,7 +16,12 @@
       </div>
       
       <div class="search-results" v-if="searchKeyword">
-        <h3 class="section-title">搜索结果：{{ searchKeyword }}</h3>
+        <div class="results-header">
+          <h3 class="section-title">搜索结果：{{ searchKeyword }}</h3>
+          <button class="clear-btn" @click="clearSearch">
+            清除搜索
+          </button>
+        </div>
         <div v-if="results.length > 0" class="results-grid">
           <NoteCard v-for="note in results" :key="note.id" :note="note" />
         </div>
@@ -28,6 +29,9 @@
           <Search />
           <p>没有找到相关笔记</p>
           <p class="tip">试试其他关键词吧~</p>
+          <button class="clear-btn" @click="clearSearch">
+            清除搜索条件
+          </button>
         </div>
       </div>
       
@@ -42,10 +46,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useNoteStore } from '@/stores/noteStore'
-import SearchBar from '@/components/SearchBar.vue'
 import NoteCard from '@/components/NoteCard.vue'
 import { Search } from '@element-plus/icons-vue'
 
@@ -76,9 +79,20 @@ const results = computed(() => {
 })
 
 const searchByTag = (tag) => {
+  if (searchKeyword.value === tag) {
+    clearSearch()
+    return
+  }
   router.push({
     path: '/search',
     query: { keyword: tag }
+  })
+}
+
+const clearSearch = () => {
+  router.push({
+    path: '/search',
+    query: {}
   })
 }
 </script>
@@ -86,11 +100,6 @@ const searchByTag = (tag) => {
 <style scoped>
 .search-page {
   padding: 40px 0;
-}
-
-.search-header {
-  max-width: 500px;
-  margin: 0 auto 40px;
 }
 
 .section-title {
@@ -118,6 +127,7 @@ const searchByTag = (tag) => {
   color: var(--text-secondary);
   font-size: 14px;
   transition: var(--transition);
+  cursor: pointer;
 }
 
 .tag-btn:hover {
@@ -127,7 +137,37 @@ const searchByTag = (tag) => {
   transform: translateY(-2px);
 }
 
-.search-results {
+.tag-btn.active {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: white;
+}
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.results-header .section-title {
+  margin-bottom: 0;
+}
+
+.clear-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clear-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .results-grid,
@@ -160,15 +200,12 @@ const searchByTag = (tag) => {
 .empty-state .tip {
   font-size: 12px;
   margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 @media (max-width: 768px) {
   .search-page {
     padding: 20px 0;
-  }
-  
-  .search-header {
-    margin-bottom: 30px;
   }
   
   .results-grid,

@@ -23,25 +23,12 @@
           />
         </el-form-item>
         
-        <el-form-item prop="phone">
+        <el-form-item prop="username">
           <el-input
-            v-model="form.phone"
-            placeholder="请输入手机号"
-            prefix-icon="Phone"
+            v-model="form.username"
+            placeholder="请输入账号"
+            prefix-icon="User"
           />
-        </el-form-item>
-        
-        <el-form-item prop="code">
-          <div class="code-input">
-            <el-input
-              v-model="form.code"
-              placeholder="请输入验证码"
-              prefix-icon="Key"
-            />
-            <button class="code-btn" @click="sendCode" :disabled="countdown > 0">
-              {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
-            </button>
-          </div>
         </el-form-item>
         
         <el-form-item prop="password">
@@ -49,6 +36,16 @@
             v-model="form.password"
             type="password"
             placeholder="请设置密码"
+            prefix-icon="Lock"
+            show-password
+          />
+        </el-form-item>
+        
+        <el-form-item prop="confirmPassword">
+          <el-input
+            v-model="form.confirmPassword"
+            type="password"
+            placeholder="请确认密码"
             prefix-icon="Lock"
             show-password
           />
@@ -62,8 +59,8 @@
         </el-form-item>
         
         <el-form-item>
-          <button class="btn btn-primary submit-btn" @click="handleRegister" :loading="loading">
-            注册
+          <button class="btn btn-primary submit-btn" @click="handleRegister" :disabled="loading">
+            {{ loading ? '注册中...' : '注册' }}
           </button>
         </el-form-item>
       </el-form>
@@ -85,48 +82,34 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
-const countdown = ref(0)
 
 const form = ref({
   nickname: '',
-  phone: '',
-  code: '',
+  username: '',
   password: '',
+  confirmPassword: '',
   agreed: false
 })
-
-const sendCode = () => {
-  if (!form.value.phone) {
-    ElMessage.warning('请输入手机号')
-    return
-  }
-  
-  countdown.value = 60
-  ElMessage.success('验证码已发送')
-  
-  const timer = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) {
-      clearInterval(timer)
-    }
-  }, 1000)
-}
 
 const handleRegister = () => {
   if (!form.value.nickname) {
     ElMessage.warning('请输入昵称')
     return
   }
-  if (!form.value.phone) {
-    ElMessage.warning('请输入手机号')
-    return
-  }
-  if (!form.value.code) {
-    ElMessage.warning('请输入验证码')
+  if (!form.value.username) {
+    ElMessage.warning('请输入账号')
     return
   }
   if (!form.value.password) {
     ElMessage.warning('请设置密码')
+    return
+  }
+  if (form.value.password.length < 6) {
+    ElMessage.warning('密码长度至少6位')
+    return
+  }
+  if (form.value.password !== form.value.confirmPassword) {
+    ElMessage.warning('两次输入的密码不一致')
     return
   }
   if (!form.value.agreed) {
@@ -138,8 +121,8 @@ const handleRegister = () => {
   
   setTimeout(() => {
     const user = {
-      id: 1,
-      username: form.value.phone,
+      id: Date.now(),
+      username: form.value.username,
       nickname: form.value.nickname,
       avatar: 'https://picsum.photos/100/100?random=newuser',
       bio: '热爱生活，记录美好',
@@ -229,31 +212,6 @@ const handleRegister = () => {
 
 :deep(.auth-form .el-input__wrapper.is-focus) {
   box-shadow: 0 0 0 2px var(--primary-light);
-}
-
-.code-input {
-  display: flex;
-  gap: 12px;
-}
-
-.code-input .el-input {
-  flex: 1;
-}
-
-.code-btn {
-  padding: 0 16px;
-  border-radius: var(--radius-md);
-  background: var(--primary-gradient);
-  color: white;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: var(--transition);
-}
-
-.code-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .agreement {
