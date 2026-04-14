@@ -1,10 +1,6 @@
 <template>
   <div class="search-page">
     <div class="container">
-      <div class="search-header">
-        <SearchBar />
-      </div>
-      
       <div class="hot-tags" v-if="!searchKeyword">
         <h3 class="section-title">热门搜索</h3>
         <div class="tags-list">
@@ -20,14 +16,21 @@
       </div>
       
       <div class="search-results" v-if="searchKeyword">
-        <h3 class="section-title">搜索结果：{{ searchKeyword }}</h3>
+        <div class="results-header">
+          <h3 class="section-title">搜索结果：{{ searchKeyword }}</h3>
+          <button class="clear-btn" @click="clearSearch">
+            <el-icon><Close /></el-icon>
+            清除搜索
+          </button>
+        </div>
         <div v-if="results.length > 0" class="results-grid">
           <NoteCard v-for="note in results" :key="note.id" :note="note" />
         </div>
         <div v-else class="empty-state">
-          <Search />
+          <el-icon :size="64" color="#ccc"><Search /></el-icon>
           <p>没有找到相关笔记</p>
           <p class="tip">试试其他关键词吧~</p>
+          <button class="btn btn-outline back-btn" @click="clearSearch">返回全部</button>
         </div>
       </div>
       
@@ -42,12 +45,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useNoteStore } from '@/stores/noteStore'
-import SearchBar from '@/components/SearchBar.vue'
 import NoteCard from '@/components/NoteCard.vue'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Close } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -79,6 +81,12 @@ const searchByTag = (tag) => {
   router.push({
     path: '/search',
     query: { keyword: tag }
+  })
+}
+
+const clearSearch = () => {
+  router.push({
+    path: '/search'
   })
 }
 </script>
@@ -125,6 +133,35 @@ const searchByTag = (tag) => {
   color: var(--primary-color);
   background: #FFF5F7;
   transform: translateY(-2px);
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-color);
+  color: var(--text-secondary);
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+.clear-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.back-btn {
+  margin-top: 20px;
+  padding: 10px 24px;
 }
 
 .search-results {
