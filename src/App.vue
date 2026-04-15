@@ -3,6 +3,14 @@
 </template>
 
 <script setup>
+import { useUserStore } from '@/stores/userStore'
+import { onMounted } from 'vue'
+
+const userStore = useUserStore()
+
+onMounted(() => {
+  userStore.initUser()
+})
 </script>
 
 <style>

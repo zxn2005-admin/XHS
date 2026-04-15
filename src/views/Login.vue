@@ -14,12 +14,13 @@
         <p class="auth-subtitle">登录后开启精彩内容</p>
       </div>
       
-      <el-form :model="form" class="auth-form" size="large">
-        <el-form-item prop="phone">
+      <el-form :model="form" class="auth-form" size="large" @submit.prevent="handleLogin">
+        <el-form-item prop="username">
           <el-input
-            v-model="form.phone"
-            placeholder="请输入手机号"
-            prefix-icon="Phone"
+            v-model="form.username"
+            placeholder="请输入账号"
+            prefix-icon="User"
+            @keyup.enter="handleLogin"
           />
         </el-form-item>
         
@@ -30,12 +31,14 @@
             placeholder="请输入密码"
             prefix-icon="Lock"
             show-password
+            @keyup.enter="handleLogin"
           />
         </el-form-item>
         
         <el-form-item>
-          <button class="btn btn-primary submit-btn" @click="handleLogin" :loading="loading">
-            登录
+          <button type="button" class="btn btn-primary submit-btn" @click="handleLogin" :disabled="loading">
+            <span v-if="loading">登录中...</span>
+            <span v-else>登录</span>
           </button>
         </el-form-item>
       </el-form>
@@ -81,13 +84,13 @@ const userStore = useUserStore()
 const loading = ref(false)
 
 const form = ref({
-  phone: '',
+  username: '',
   password: ''
 })
 
 const handleLogin = () => {
-  if (!form.value.phone) {
-    ElMessage.warning('请输入手机号')
+  if (!form.value.username) {
+    ElMessage.warning('请输入账号')
     return
   }
   if (!form.value.password) {
@@ -100,7 +103,7 @@ const handleLogin = () => {
   setTimeout(() => {
     const user = {
       id: 1,
-      username: form.value.phone,
+      username: form.value.username,
       nickname: '小红书用户',
       avatar: 'https://picsum.photos/100/100?random=user',
       bio: '热爱生活，记录美好',

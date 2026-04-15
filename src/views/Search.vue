@@ -1,10 +1,6 @@
 <template>
   <div class="search-page">
     <div class="container">
-      <div class="search-header">
-        <SearchBar />
-      </div>
-      
       <div class="hot-tags" v-if="!searchKeyword">
         <h3 class="section-title">热门搜索</h3>
         <div class="tags-list">
@@ -19,15 +15,22 @@
         </div>
       </div>
       
-      <div class="search-results" v-if="searchKeyword">
-        <h3 class="section-title">搜索结果：{{ searchKeyword }}</h3>
+      <div class="search-results">
+        <div class="results-header" v-if="searchKeyword">
+          <h3 class="section-title">搜索结果：{{ searchKeyword }}</h3>
+          <button class="clear-btn" @click="clearSearch">
+            <Close />
+            <span>清除搜索</span>
+          </button>
+        </div>
         <div v-if="results.length > 0" class="results-grid">
           <NoteCard v-for="note in results" :key="note.id" :note="note" />
         </div>
-        <div v-else class="empty-state">
+        <div v-else-if="searchKeyword" class="empty-state">
           <Search />
           <p>没有找到相关笔记</p>
           <p class="tip">试试其他关键词吧~</p>
+          <button class="btn btn-primary mt-4" @click="clearSearch">查看全部笔记</button>
         </div>
       </div>
       
@@ -42,12 +45,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useNoteStore } from '@/stores/noteStore'
-import SearchBar from '@/components/SearchBar.vue'
 import NoteCard from '@/components/NoteCard.vue'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Close } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -71,7 +73,7 @@ const recommendNotes = computed(() => {
 const searchKeyword = computed(() => route.query.keyword || '')
 
 const results = computed(() => {
-  if (!searchKeyword.value) return []
+  if (!searchKeyword.value) return noteStore.notes
   return noteStore.searchNotes(searchKeyword.value)
 })
 
@@ -81,16 +83,18 @@ const searchByTag = (tag) => {
     query: { keyword: tag }
   })
 }
+
+const clearSearch = () => {
+  router.push({
+    path: '/search',
+    query: {}
+  })
+}
 </script>
 
 <style scoped>
 .search-page {
   padding: 40px 0;
-}
-
-.search-header {
-  max-width: 500px;
-  margin: 0 auto 40px;
 }
 
 .section-title {
@@ -127,7 +131,37 @@ const searchByTag = (tag) => {
   transform: translateY(-2px);
 }
 
-.search-results {
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-color);
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: var(--transition);
+}
+
+.clear-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.clear-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.mt-4 {
+  margin-top: 16px;
 }
 
 .results-grid,
@@ -167,8 +201,10 @@ const searchByTag = (tag) => {
     padding: 20px 0;
   }
   
-  .search-header {
-    margin-bottom: 30px;
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
   
   .results-grid,
