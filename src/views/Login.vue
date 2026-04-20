@@ -15,11 +15,11 @@
       </div>
       
       <el-form :model="form" class="auth-form" size="large">
-        <el-form-item prop="phone">
+        <el-form-item prop="username">
           <el-input
-            v-model="form.phone"
-            placeholder="请输入手机号"
-            prefix-icon="Phone"
+            v-model="form.username"
+            placeholder="请输入账号"
+            prefix-icon="User"
           />
         </el-form-item>
         
@@ -34,8 +34,8 @@
         </el-form-item>
         
         <el-form-item>
-          <button class="btn btn-primary submit-btn" @click="handleLogin" :loading="loading">
-            登录
+          <button class="btn btn-primary submit-btn" @click="handleLogin" :disabled="loading">
+            {{ loading ? '登录中...' : '登录' }}
           </button>
         </el-form-item>
       </el-form>
@@ -81,13 +81,13 @@ const userStore = useUserStore()
 const loading = ref(false)
 
 const form = ref({
-  phone: '',
+  username: '',
   password: ''
 })
 
 const handleLogin = () => {
-  if (!form.value.phone) {
-    ElMessage.warning('请输入手机号')
+  if (!form.value.username) {
+    ElMessage.warning('请输入账号')
     return
   }
   if (!form.value.password) {
@@ -100,8 +100,8 @@ const handleLogin = () => {
   setTimeout(() => {
     const user = {
       id: 1,
-      username: form.value.phone,
-      nickname: '小红书用户',
+      username: form.value.username,
+      nickname: form.value.username,
       avatar: 'https://picsum.photos/100/100?random=user',
       bio: '热爱生活，记录美好',
       followers: 86,

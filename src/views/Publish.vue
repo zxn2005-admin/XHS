@@ -98,7 +98,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useNoteStore, useUserStore } from '@/stores/noteStore'
+import { useNoteStore } from '@/stores/noteStore'
+import { useUserStore } from '@/stores/userStore'
 import { Plus, Close } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -183,9 +184,9 @@ const handleSubmit = () => {
       images: images.value,
       tags: form.value.tags,
       user: {
-        id: 1,
-        nickname: '用户',
-        avatar: 'https://picsum.photos/100/100?random=user'
+        id: userStore.userInfo.id || Date.now(),
+        nickname: userStore.userInfo.nickname || '用户',
+        avatar: userStore.userInfo.avatar || 'https://picsum.photos/100/100?random=user'
       }
     }
     
